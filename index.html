@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Amir Arsalan Tayebi (Team Lead)">
+    <title>Maze Path Finder</title>
+    <style>
+        canvas {
+            border: 2px solid black;
+            max-width: 100%;
+            height: auto;
+            direction: rtl;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            flex-direction: column;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            font-size: 2rem;
+        }
+
+        /* Media queries for different screen sizes */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            canvas {
+                width: 90vw;
+                height: 90vw;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.25rem;
+            }
+            canvas {
+                width: 90vw;
+                height: 90vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Maze Path Finder</h1>
+    <canvas id="mazeCanvas" width="600" height="600"></canvas>
+
+    <script>
+    class MazePathFinder {
+        constructor() {
+            this.canvas = document.getElementById('mazeCanvas');
+            this.ctx = this.canvas.getContext('2d');
+            this.cellSize = Math.floor(this.canvas.width / 10); // Adjust cell size based on canvas size
+            
+            this.maze = [
+                ['S', 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [1, 1, 0, 1, 1, 0, 1, 1, 0, 1],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [0, 1, 1, 0, 1, 0, 1, 0, 1, 1],
+                [0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+                [0, 1, 0, 0, 1, 0, 1, 0, 1, 1],
+                [0, 1, 1, 1, 1, 0, 0, 1, 0, 0],
+                [0, 1, 0, 1, 1, 0, 1, 1, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 1, 1, 1, 1, 0, 1, 1, 1, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0, 'E']
+            ];
+        }
+
+        drawMaze() {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            for (let y = 0; y < this.maze.length; y++) {
+                for (let x = 0; x < this.maze[y].length; x++) {
+                    const cell = this.maze[y][x];
+
+                    if (cell === 1) {
+                        this.ctx.fillStyle = 'black';  // Wall
+                    } else if (cell === 'S') {
+                        this.ctx.fillStyle = 'green';  // Start
+                    } else if (cell === 'E') {
+                        this.ctx.fillStyle = 'red';    // End
+                    } else {
+                        this.ctx.fillStyle = 'white';  // Open path
+                    }
+
+                    this.ctx.fillRect(
+                        x * this.cellSize, 
+                        y * this.cellSize, 
+                        this.cellSize, 
+                        this.cellSize
+                    );
+
+                    this.ctx.strokeStyle = 'gray';
+                    this.ctx.strokeRect(
+                        x * this.cellSize, 
+                        y * this.cellSize, 
+                        this.cellSize, 
+                        this.cellSize
+                    );
+                }
+            }
+        }
+
+        findPath() {
+            const start = this.findStart();
+            const queue = [[start]];
+            const visited = new Set([`${start[0]},${start[1]}`]);
+
+            const directions = [[0,1], [1,0], [0,-1], [-1,0]];
+
+            while (queue.length > 0) {
+                const path = queue.shift();
+                const [x, y] = path[path.length - 1];
+
+                if (this.maze[x][y] === 'E') {
+                    this.animatePath(path);
+                    return path;
+                }
+
+                for (let [dx, dy] of directions) {
+                    const nx = x + dx;
+                    const ny = y + dy;
+
+                    if (
+                        nx >= 0 && nx < this.maze.length &&
+                        ny >= 0 && ny < this.maze[0].length &&
+                        this.maze[nx][ny] !== 1 &&
+                        !visited.has(`${nx},${ny}`)
+                    ) {
+                        const newPath = [...path, [nx, ny]];
+                        queue.push(newPath);
+                        visited.add(`${nx},${ny}`);
+                    }
+                }
+            }
+            return null;
+        }
+
+        findStart() {
+            for (let x = 0; x < this.maze.length; x++) {
+                for (let y = 0; y < this.maze[x].length; y++) {
+                    if (this.maze[x][y] === 'S') return [x, y];
+                }
+            }
+        }
+
+        animatePath(path) {
+            let step = 0;
+            const animate = () => {
+                if (step < path.length) {
+                    const [x, y] = path[step];
+                    
+                    this.ctx.fillStyle = 'blue';
+                    this.ctx.fillRect(
+                        y * this.cellSize, 
+                        x * this.cellSize, 
+                        this.cellSize, 
+                        this.cellSize
+                    );
+
+                    step++;
+                    setTimeout(animate, 200);
+                }
+            };
+            animate();
+        }
+
+        init() {
+            this.drawMaze();
+            setTimeout(() => this.findPath(), 1000);
+        }
+    }
+
+    window.onload = () => {
+        const maze = new MazePathFinder();
+        maze.init();
+    };
+    </script>
+</body>
+</html>

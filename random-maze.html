@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Amir Arsalan Tayebi (Team Lead)">
+    <title>Random Maze Generator + BFS</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        #container { padding: 20px; }
+        header h1 { margin: 0; font-size: 1.5rem; }
+        .toolbar { padding: 16px; text-align: center; }
+        #generate-button {
+            padding: 10px 20px; font-size: 1rem; border: none; border-radius: 6px;
+            background-color: #3a86ff; color: #fff; cursor: pointer;
+        }
+        #generate-button:hover { background-color: #2f6fd4; }
+        #status { text-align: center; padding-bottom: 16px; color: #555; }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <header><h1>🗺️ Random Maze Generator + BFS Path Finder</h1></header>
+        <div class="toolbar">
+            <button id="generate-button">Generate New Maze</button>
+        </div>
+        <main>
+            <div id="maze"></div>
+        </main>
+        <p id="status"></p>
+    </div>
+    <script src="labyrinth.js"></script>
+</body>
+</html>
